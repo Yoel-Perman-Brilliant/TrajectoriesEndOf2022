@@ -4,14 +4,34 @@
 
 package frc.robot;
 
+import com.spikes2212.control.FeedForwardSettings;
+import com.spikes2212.control.PIDSettings;
+import edu.wpi.first.math.trajectory.Trajectory;
+import edu.wpi.first.math.trajectory.TrajectoryGenerator;
+import edu.wpi.first.math.trajectory.TrajectoryUtil;
+import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.commands.FollowTrajectory;
+import frc.robot.subsystems.Drivetrain;
+
+import java.io.IOException;
+import java.nio.file.Path;
 
 public class Robot extends TimedRobot {
 
   @Override
   public void robotInit() {
-
+    Trajectory trajectory;
+    try {
+      trajectory = TrajectoryUtil.fromPathweaverJson(
+              Path.of(Filesystem.getDeployDirectory().getPath(), "testtrajectory.json"));
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
+    FollowTrajectory followTrajectory = new FollowTrajectory(trajectory,
+            new Drivetrain(null, null, null, 0),
+            new PIDSettings(0, 0, 0), FeedForwardSettings.EMPTY_FFSETTINGS);
   }
 
   @Override
